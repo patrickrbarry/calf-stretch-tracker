@@ -73,7 +73,7 @@
 
     function updateSessionCount() {
       const todaySessions = sessionsToday.filter(s => s.date === today).length;
-      document.getElementById('session-count').textContent = \`Sessions Completed: \${todaySessions} / 4\`;
+      document.getElementById('session-count').textContent = `Sessions Completed: ${todaySessions} / 4`;
     }
 
     function saveSession() {
@@ -104,7 +104,7 @@
       }
 
       const side = currentRep % 2 === 0 ? 'Left Foot' : 'Right Foot';
-      document.getElementById('rep-display').textContent = \`Stretch: \${side} (\${currentRep + 1}/6)\`;
+      document.getElementById('rep-display').textContent = `Stretch: ${side} (${currentRep + 1}/6)`;
       updateProgressBar((currentRep + 1) / 6 * 100);
 
       repTimer = setTimeout(() => {
@@ -114,7 +114,7 @@
     }
 
     function updateProgressBar(percent = 0) {
-      document.getElementById('progress-bar').style.width = \`\${percent}%\`;
+      document.getElementById('progress-bar').style.width = `${percent}%`;
     }
 
     function stopSession() {
