@@ -47,7 +47,6 @@
       height: 100%;
       background: #4caf50;
       width: 0%;
-      transition: width 0.3s;
     }
   </style>
 </head>
@@ -83,38 +82,47 @@
     }
 
     let currentRep = 0;
+    let totalReps = 12;
     let repTimer;
+    let progressInterval;
 
     function startSession() {
       currentRep = 0;
       document.getElementById('session-status').textContent = '';
       document.getElementById('timer-area').style.display = 'block';
       document.getElementById('rep-display').textContent = 'Starting...';
-      updateProgressBar();
+      updateProgressBar(0);
       setTimeout(runRep, 1000);
+      animateProgressBar();
     }
 
     function runRep() {
-      if (currentRep >= 6) {
+      if (currentRep >= totalReps) {
         document.getElementById('rep-display').textContent = 'Session Complete!';
         document.getElementById('session-status').innerHTML = '<span class="complete">✅ Good job!</span>';
         saveSession();
-        updateProgressBar(100);
         return;
       }
 
       const side = currentRep % 2 === 0 ? 'Left Foot' : 'Right Foot';
-      document.getElementById('rep-display').textContent = `Stretch: ${side} (${currentRep + 1}/6)`;
-      updateProgressBar((currentRep + 1) / 6 * 100);
+      document.getElementById('rep-display').textContent = `Stretch: ${side} (${currentRep + 1}/12)`;
 
       repTimer = setTimeout(() => {
         currentRep++;
         runRep();
-      }, 30000); // 30 seconds
+      }, 30000); // 30 seconds per rep
     }
 
-    function updateProgressBar(percent = 0) {
-      document.getElementById('progress-bar').style.width = `${percent}%`;
+    function animateProgressBar() {
+      const progressBar = document.getElementById('progress-bar');
+      progressBar.style.transition = 'width 360s linear'; // 12 reps x 30s
+      progressBar.style.width = '100%';
+    }
+
+    function updateProgressBar(percent) {
+      const progressBar = document.getElementById('progress-bar');
+      progressBar.style.transition = 'none';
+      progressBar.style.width = `${percent}%`;
     }
 
     function stopSession() {
