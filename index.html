@@ -10,6 +10,12 @@
       font-family: sans-serif;
       padding: 1em;
       background: #f5f5f5;
+      color: #000;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: #121212;
+      color: #fff;
     }
     h1 {
       text-align: center;
@@ -21,6 +27,10 @@
       border-radius: 10px;
       box-shadow: 0 0 5px #ccc;
     }
+    body.dark .session {
+      background: #1e1e1e;
+      box-shadow: 0 0 5px #555;
+    }
     button {
       padding: 10px 20px;
       font-size: 16px;
@@ -30,6 +40,11 @@
       font-size: 24px;
       margin-top: 10px;
       text-align: center;
+    }
+    .timer {
+      font-size: 20px;
+      text-align: center;
+      margin: 10px 0;
     }
     .complete {
       color: green;
@@ -48,16 +63,28 @@
       background: #4caf50;
       width: 0%;
     }
+    .toggle-dark {
+      float: right;
+      font-size: 14px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: inherit;
+    }
   </style>
 </head>
 <body>
-  <h1>Calf Stretch Tracker</h1>
+  <h1>
+    Calf Stretch Tracker
+    <button class="toggle-dark" onclick="toggleDarkMode()">🌓 Toggle Dark Mode</button>
+  </h1>
   <div class="session">
     <h2>Today's Sessions</h2>
     <p id="session-count">Sessions Completed: 0 / 4</p>
     <button onclick="startSession()">Start New Session</button>
     <div id="timer-area" style="display:none;">
       <p class="rep-display" id="rep-display">Get Ready...</p>
+      <p class="timer" id="countdown">30s</p>
       <div class="progress-container">
         <div class="progress-bar" id="progress-bar"></div>
       </div>
@@ -65,6 +92,8 @@
     </div>
     <p id="session-status"></p>
   </div>
+
+  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
   <script>
     let sessionsToday = JSON.parse(localStorage.getItem('sessionsToday') || '[]');
@@ -84,16 +113,18 @@
     let currentRep = 0;
     let totalReps = 12;
     let repTimer;
-    let progressInterval;
+    let countdownTimer;
+    let countdownValue = 30;
 
     function startSession() {
       currentRep = 0;
+      countdownValue = 30;
       document.getElementById('session-status').textContent = '';
       document.getElementById('timer-area').style.display = 'block';
       document.getElementById('rep-display').textContent = 'Starting...';
       updateProgressBar(0);
-      setTimeout(runRep, 1000);
       animateProgressBar();
+      setTimeout(runRep, 1000);
     }
 
     function runRep() {
@@ -106,16 +137,30 @@
 
       const side = currentRep % 2 === 0 ? 'Left Foot' : 'Right Foot';
       document.getElementById('rep-display').textContent = `Stretch: ${side} (${currentRep + 1}/12)`;
+      countdownValue = 30;
+      document.getElementById('countdown').textContent = countdownValue + 's';
+      playBeep();
+      startCountdown();
 
       repTimer = setTimeout(() => {
         currentRep++;
         runRep();
-      }, 30000); // 30 seconds per rep
+      }, 30000);
+    }
+
+    function startCountdown() {
+      clearInterval(countdownTimer);
+      countdownTimer = setInterval(() => {
+        countdownValue--;
+        if (countdownValue >= 0) {
+          document.getElementById('countdown').textContent = countdownValue + 's';
+        }
+      }, 1000);
     }
 
     function animateProgressBar() {
       const progressBar = document.getElementById('progress-bar');
-      progressBar.style.transition = 'width 360s linear'; // 12 reps x 30s
+      progressBar.style.transition = 'width 360s linear';
       progressBar.style.width = '100%';
     }
 
@@ -127,10 +172,21 @@
 
     function stopSession() {
       clearTimeout(repTimer);
+      clearInterval(countdownTimer);
       document.getElementById('timer-area').style.display = 'none';
       document.getElementById('rep-display').textContent = '';
       document.getElementById('session-status').textContent = 'Session stopped.';
       updateProgressBar(0);
+    }
+
+    function playBeep() {
+      const beep = document.getElementById('beep');
+      beep.currentTime = 0;
+      beep.play();
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
     }
 
     updateSessionCount();
